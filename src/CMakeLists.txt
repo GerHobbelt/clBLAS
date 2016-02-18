@@ -69,7 +69,7 @@ set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR} )
 # On windows, it's convenient to change the default install prefix such that it does NOT point to 'program files' (permissions problems)
 # Need to check out CMAKE_RUNTIME_OUTPUT_DIRECTORY variable, and see if that eliminates the need to modify install path
 if( WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT )
-	set( CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/package" CACHE PATH "Install path prefix, prepended onto install directories" FORCE )
+    set( CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/package" CACHE PATH "Install path prefix, prepended onto install directories" FORCE )
 endif( )
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -120,78 +120,78 @@ endif()
 # Find the BLAS library
 # TODO: maybe this could be written using the FindBLAS module in the future
 if( BUILD_TEST )
-	if(NOT CORR_TEST_WITH_ACML)
-	        if(APPLE)
-			find_library(BLAS_LIBRARIES Accelerate)
-		       	MARK_AS_ADVANCED(BLAS_LIBRARIES)
-		       	message(STATUS "Using Accelerate framework on Mac OS-X")
-	       	else()
-			find_package( Netlib COMPONENTS BLAS REQUIRED )
-              	endif()
-	else( )
-		# Find ACML BLAS implementation
-		# platform dependent ACML subdirectory
-		if (WIN32)
-			set(ACML_SUBDIR ifort${TARGET_PLATFORM}_mp)
-		else()
-		   set(ACML_SUBDIR gfortran${TARGET_PLATFORM}_mp)
-		endif()
+    if(NOT CORR_TEST_WITH_ACML)
+            if(APPLE)
+            find_library(BLAS_LIBRARIES Accelerate)
+                   MARK_AS_ADVANCED(BLAS_LIBRARIES)
+                   message(STATUS "Using Accelerate framework on Mac OS-X")
+               else()
+            find_package( Netlib COMPONENTS BLAS REQUIRED )
+                  endif()
+    else( )
+        # Find ACML BLAS implementation
+        # platform dependent ACML subdirectory
+        if (WIN32)
+            set(ACML_SUBDIR ifort${TARGET_PLATFORM}_mp)
+        else()
+           set(ACML_SUBDIR gfortran${TARGET_PLATFORM}_mp)
+        endif()
 
-		find_path(ACML_INCLUDE_DIRS acml.h
-			HINTS
-				${ACML_ROOT}/include
-				${ACML_ROOT}/${ACML_SUBDIR}/include
-				$ENV{ACML_ROOT}/include
+        find_path(ACML_INCLUDE_DIRS acml.h
+            HINTS
+                ${ACML_ROOT}/include
+                ${ACML_ROOT}/${ACML_SUBDIR}/include
+                $ENV{ACML_ROOT}/include
                                 $ENV{ACML_ROOT}/${ACML_SUBDIR}/include
-		)
+        )
 
-		if( ACML_INCLUDE_DIRS )
-		else()
-			message(WARNING "Cannot find acml.h")
-		endif()
-		
-		if( UNIX )
-			find_library(ACML_LIBRARIES acml_mp
-				HINTS
-					${ACML_ROOT}/lib
-					${ACML_ROOT}/${ACML_SUBDIR}/lib
-					$ENV{ACML_ROOT}/lib
+        if( ACML_INCLUDE_DIRS )
+        else()
+            message(WARNING "Cannot find acml.h")
+        endif()
+        
+        if( UNIX )
+            find_library(ACML_LIBRARIES acml_mp
+                HINTS
+                    ${ACML_ROOT}/lib
+                    ${ACML_ROOT}/${ACML_SUBDIR}/lib
+                    $ENV{ACML_ROOT}/lib
                                         $ENV{ACML_ROOT}/${ACML_SUBDIR}/lib
-			)
-			find_library(_acml_mv_library acml_mv
-				HINTS
-					${ACML_ROOT}/lib
-					${ACML_ROOT}/${ACML_SUBDIR}/lib
-					$ENV{ACML_ROOT}/lib
+            )
+            find_library(_acml_mv_library acml_mv
+                HINTS
+                    ${ACML_ROOT}/lib
+                    ${ACML_ROOT}/${ACML_SUBDIR}/lib
+                    $ENV{ACML_ROOT}/lib
                                         $ENV{ACML_ROOT}/${ACML_SUBDIR}/lib
-			)
-			mark_as_advanced(_acml_mv_library)
-		endif( )
-		
-		if(WIN32)
-			find_library(ACML_LIBRARIES libacml_mp_dll
-				HINTS
-					${ACML_ROOT}/lib
-					${ACML_ROOT}/${ACML_SUBDIR}/lib
-					$ENV{ACML_ROOT}/lib
+            )
+            mark_as_advanced(_acml_mv_library)
+        endif( )
+        
+        if(WIN32)
+            find_library(ACML_LIBRARIES libacml_mp_dll
+                HINTS
+                    ${ACML_ROOT}/lib
+                    ${ACML_ROOT}/${ACML_SUBDIR}/lib
+                    $ENV{ACML_ROOT}/lib
                                         $ENV{ACML_ROOT}/${ACML_SUBDIR}/lib
-			)
-		endif( )
-		
-		if( NOT ACML_LIBRARIES )
-			message(WARNING "Cannot find libacml")
-		endif( )
+            )
+        endif( )
+        
+        if( NOT ACML_LIBRARIES )
+            message(WARNING "Cannot find libacml")
+        endif( )
 
-		if(ACML_INCLUDE_DIRS AND ACML_LIBRARIES)
-			if(_acml_mv_library)
-				list(APPEND ACML_LIBRARIES ${_acml_mv_library})
-			endif()
-			message(STATUS "Found ACML: ${ACML_LIBRARIES}")
-			set(ACML_FOUND TRUE BOOL "Found the ACML package")
-		endif()
-		mark_as_advanced(ACML_FOUND ACML_INCLUDE_DIRS ACML_LIBRARIES)
+        if(ACML_INCLUDE_DIRS AND ACML_LIBRARIES)
+            if(_acml_mv_library)
+                list(APPEND ACML_LIBRARIES ${_acml_mv_library})
+            endif()
+            message(STATUS "Found ACML: ${ACML_LIBRARIES}")
+            set(ACML_FOUND TRUE BOOL "Found the ACML package")
+        endif()
+        mark_as_advanced(ACML_FOUND ACML_INCLUDE_DIRS ACML_LIBRARIES)
 
-	endif( )
+    endif( )
 endif( )
 
 # This will define OPENCL_FOUND
@@ -212,10 +212,10 @@ message(STATUS "Boost_PROGRAM_OPTIONS_LIBRARY: ${Boost_PROGRAM_OPTIONS_LIBRARY}"
 
 
 if( NOT Boost_FOUND )
-	message( STATUS "The clBLAS ktest requires boost to be installed" )
-	set( BUILD_KTEST OFF )
-	message( STATUS "The clBLAS client requires boost to be installed" )
-	set( BUILD_CLIENT OFF )
+    message( STATUS "The clBLAS ktest requires boost to be installed" )
+    set( BUILD_KTEST OFF )
+    message( STATUS "The clBLAS client requires boost to be installed" )
+    set( BUILD_CLIENT OFF )
 endif()
 
 # Turn on maximum compiler verbosity
@@ -236,10 +236,10 @@ if(CMAKE_COMPILER_IS_GNUCXX)
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-builtin")
     endif()
 elseif( MSVC )
-	# CMake sets huge stack frames for windows, for whatever reason.  We go with compiler default.
-	string( REGEX REPLACE "/STACK:[0-9]+" "" CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}" )
-	string( REGEX REPLACE "/STACK:[0-9]+" "" CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}" )
-	string( REGEX REPLACE "/STACK:[0-9]+" "" CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS}" ) 
+    # CMake sets huge stack frames for windows, for whatever reason.  We go with compiler default.
+    string( REGEX REPLACE "/STACK:[0-9]+" "" CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}" )
+    string( REGEX REPLACE "/STACK:[0-9]+" "" CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}" )
+    string( REGEX REPLACE "/STACK:[0-9]+" "" CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS}" ) 
 endif( )
 
 if (WIN32)
@@ -253,48 +253,48 @@ configure_file( "${PROJECT_SOURCE_DIR}/clBLAS.version.h.in" "${PROJECT_BINARY_DI
 
 # configure a header file to pass the CMake version settings to the source, and package the header files in the output archive
 install( FILES 
-			"clBLAS.h" 
-			"clAmdBlas.h"
-			"clAmdBlas.version.h"
-			"clBLAS-complex.h"
-			"${PROJECT_BINARY_DIR}/include/clBLAS.version.h"
-		DESTINATION 
-			"./include" )
+            "clBLAS.h" 
+            "clAmdBlas.h"
+            "clAmdBlas.version.h"
+            "clBLAS-complex.h"
+            "${PROJECT_BINARY_DIR}/include/clBLAS.version.h"
+        DESTINATION 
+            "./include" )
 
 
 if( BUILD_CLIENT AND IS_DIRECTORY "${PROJECT_SOURCE_DIR}/client")
-	add_subdirectory( client )
+    add_subdirectory( client )
 endif( )
 
 if( BUILD_PERFORMANCE AND IS_DIRECTORY "${PROJECT_SOURCE_DIR}/scripts/perf" )
-	add_subdirectory( scripts/perf )
+    add_subdirectory( scripts/perf )
 endif( )
 
 if( BUILD_RUNTIME AND IS_DIRECTORY "${PROJECT_SOURCE_DIR}/library" )
-	add_subdirectory( library )
-	add_subdirectory( library/tools/tune )
-	if( BUILD_KTEST )
-		add_subdirectory( library/tools/ktest )
-	endif( )
+    add_subdirectory( library )
+    add_subdirectory( library/tools/tune )
+    if( BUILD_KTEST )
+        add_subdirectory( library/tools/ktest )
+    endif( )
 endif()
 
 if( BUILD_SAMPLE AND IS_DIRECTORY "${PROJECT_SOURCE_DIR}/samples" )
-	add_subdirectory( samples )
+    add_subdirectory( samples )
 endif( )
 
 # The build server is not supposed to build or package any of the tests; build server script will define this on the command line with 
 # cmake -G "Visual Studio 10 Win64" -D BUILDSERVER:BOOL=ON ../..
 if( BUILD_TEST )
-	if( IS_DIRECTORY "${PROJECT_SOURCE_DIR}/tests" )
-		add_subdirectory(tests)
-	endif( )
+    if( IS_DIRECTORY "${PROJECT_SOURCE_DIR}/tests" )
+        add_subdirectory(tests)
+    endif( )
 
-	# These tests #include <getopts.h>, which is not windows compliant
-	if (NOT WIN32 AND IS_DIRECTORY "${PROJECT_SOURCE_DIR}/library" )
-		add_subdirectory( library/blas/gens/tests )
-		add_subdirectory( library/blas/gens/legacy/tests )
-		add_subdirectory( library/common/tests )
-	endif( )
+    # These tests #include <getopts.h>, which is not windows compliant
+    if (NOT WIN32 AND IS_DIRECTORY "${PROJECT_SOURCE_DIR}/library" )
+        add_subdirectory( library/blas/gens/tests )
+        add_subdirectory( library/blas/gens/legacy/tests )
+        add_subdirectory( library/common/tests )
+    endif( )
 endif( )
 
 if(WIN32)
@@ -319,17 +319,17 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/clBLASConfigVersion.cmake
 
 # The following code is setting variables to control the behavior of CPack to generate our 
 if( WIN32 )
-	set( CPACK_SOURCE_GENERATOR "ZIP" )
-	set( CPACK_GENERATOR "ZIP" )
+    set( CPACK_SOURCE_GENERATOR "ZIP" )
+    set( CPACK_GENERATOR "ZIP" )
 else( )
-	set( CPACK_SOURCE_GENERATOR "TGZ" )
-	set( CPACK_GENERATOR "TGZ" )
+    set( CPACK_SOURCE_GENERATOR "TGZ" )
+    set( CPACK_GENERATOR "TGZ" )
 endif( )
 
 if( TARGET_PLATFORM EQUAL 64 )
-	set( CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${clBLAS_VERSION}-${CMAKE_HOST_SYSTEM_NAME}-x64")
+    set( CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${clBLAS_VERSION}-${CMAKE_HOST_SYSTEM_NAME}-x64")
 else( )
-	set( CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${clBLAS_VERSION}-${CMAKE_HOST_SYSTEM_NAME}-x32")
+    set( CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${clBLAS_VERSION}-${CMAKE_HOST_SYSTEM_NAME}-x32")
 endif( )
 
 set( CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${clBLAS_VERSION}-${CMAKE_HOST_SYSTEM_NAME}-Source")
