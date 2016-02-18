@@ -121,13 +121,13 @@ endif()
 # TODO: maybe this could be written using the FindBLAS module in the future
 if( BUILD_TEST )
     if(NOT CORR_TEST_WITH_ACML)
-            if(APPLE)
+        if(APPLE)
             find_library(BLAS_LIBRARIES Accelerate)
                    MARK_AS_ADVANCED(BLAS_LIBRARIES)
                    message(STATUS "Using Accelerate framework on Mac OS-X")
-               else()
+        else()
             find_package( Netlib COMPONENTS BLAS REQUIRED )
-                  endif()
+        endif()
     else( )
         # Find ACML BLAS implementation
         # platform dependent ACML subdirectory
