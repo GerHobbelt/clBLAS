@@ -141,8 +141,12 @@ target_link_libraries(tune ${OPENCL_LIBRARIES} ${TIME_LIBRARY} ${MATH_LIBRARY})
 set_target_properties( tune PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/staging" )
 
 # CPack configuration; include the executable into the package
-install( TARGETS tune
-		RUNTIME DESTINATION bin${SUFFIX_BIN}
-		LIBRARY DESTINATION lib${SUFFIX_LIB}
-		ARCHIVE DESTINATION lib${SUFFIX_LIB}/import
-		)
+
+install(
+    TARGETS tune
+    EXPORT "${targets_export_name}"
+    LIBRARY DESTINATION "lib"
+    ARCHIVE DESTINATION "lib"
+    RUNTIME DESTINATION "bin"
+    INCLUDES DESTINATION "${include_install_dir}"
+)

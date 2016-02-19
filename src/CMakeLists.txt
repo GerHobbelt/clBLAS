@@ -40,9 +40,9 @@ endif( )
 
 # If we are on linux, and we wish to link with the netlib BLAS implementation, we need to have a valid fortran compiler
 if( NOT CORR_TEST_WITH_ACML AND NOT WIN32 AND NOT APPLE )
-  project(clBLAS Fortran C CXX VERSION 2.3.0)
+  project(clBLAS VERSION 2.3.0 LANGUAGES Fortran C CXX)
 else( )
-  project(clBLAS C CXX VERSION 2.3.0)
+  project(clBLAS VERSION 2.3.0 LANGUAGES C CXX)
 endif( )
 
 # Increment this if we break backward compatibility.
@@ -192,9 +192,10 @@ set( Boost_DETAILED_FAILURE_MSG   ON )
 set( Boost_DEBUG ON )
 set( Boost_ADDITIONAL_VERSIONS "1.44.0" "1.44" "1.47.0" "1.47" )
 
-find_package( Boost 1.33.0 COMPONENTS program_options )
-message(STATUS "Boost_PROGRAM_OPTIONS_LIBRARY: ${Boost_PROGRAM_OPTIONS_LIBRARY}")
-
+if(BUILD_KTEST OR BUILD_CLIENT)
+    find_package( Boost 1.33.0 COMPONENTS program_options )
+    message(STATUS "Boost_PROGRAM_OPTIONS_LIBRARY: ${Boost_PROGRAM_OPTIONS_LIBRARY}")
+endif()
 
 if( NOT Boost_FOUND )
     message( STATUS "The clBLAS ktest requires boost to be installed" )
@@ -246,6 +247,47 @@ install( FILES
         DESTINATION
             "./include" )
 
+####
+# Installation (https://github.com/forexample/package-example)
+
+set(config_install_dir "lib/cmake/${PROJECT_NAME}")
+set(include_install_dir "include")
+
+set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
+
+# Configuration
+set(version_config "${generated_dir}/${PROJECT_NAME}ConfigVersion.cmake")
+set(project_config "${generated_dir}/${PROJECT_NAME}Config.cmake")
+set(targets_export_name "${PROJECT_NAME}Targets")
+set(namespace "${PROJECT_NAME}::")
+
+# Include module with fuction 'write_basic_package_version_file'
+include(CMakePackageConfigHelpers)
+
+# Note: PROJECT_VERSION is used as a VERSION
+write_basic_package_version_file(
+    "${version_config}" COMPATIBILITY SameMajorVersion
+)
+
+# Use variables:
+#   * targets_export_name
+#   * PROJECT_NAME
+configure_package_config_file(
+    "cmake/Config.cmake.in"
+    "${project_config}"
+    INSTALL_DESTINATION "${config_install_dir}"
+)
+
+install(
+    FILES "${project_config}" "${version_config}"
+    DESTINATION "${config_install_dir}"
+)
+
+install(
+    EXPORT "${targets_export_name}"
+    NAMESPACE "${namespace}"
+    DESTINATION "${config_install_dir}"
+)
 
 if( BUILD_CLIENT AND IS_DIRECTORY "${PROJECT_SOURCE_DIR}/client")
     add_subdirectory( client )
@@ -288,7 +330,6 @@ else()
   set(destdir share/clBLAS)
 endif()
 string(REGEX REPLACE "[^/]+" ".." reldir "${destdir}")
-install(EXPORT Library DESTINATION ${destdir} FILE clBLASTargets.cmake)
 
 # The following code is setting variables to control the behavior of CPack to generate our
 if( WIN32 )

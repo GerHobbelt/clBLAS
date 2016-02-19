@@ -315,12 +315,14 @@ set_target_properties( clBLAS PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BIN
 target_link_libraries(clBLAS ${OPENCL_LIBRARIES} ${MATH_LIBRARY})
 
 # CPack configuration; include the executable into the package
-install( TARGETS clBLAS
-                EXPORT Library
-                RUNTIME DESTINATION bin${SUFFIX_BIN}
-                LIBRARY DESTINATION lib${SUFFIX_LIB}
-		ARCHIVE DESTINATION lib${SUFFIX_LIB}/import
-		)
+install(
+    TARGETS clBLAS
+    EXPORT "${targets_export_name}"
+    LIBRARY DESTINATION "lib"
+    ARCHIVE DESTINATION "lib"
+    RUNTIME DESTINATION "bin"
+    INCLUDES DESTINATION "${include_install_dir}"
+)
 
 # For debug builds, include the debug runtimes into the package for testing on non-developer machines
 set( CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP true )
