@@ -40,25 +40,10 @@ endif( )
 
 # If we are on linux, and we wish to link with the netlib BLAS implementation, we need to have a valid fortran compiler
 if( NOT CORR_TEST_WITH_ACML AND NOT WIN32 AND NOT APPLE )
-  project(clBLAS Fortran C CXX )
+  project(clBLAS Fortran C CXX VERSION 2.3.0)
 else( )
-  project(clBLAS C CXX)
+  project(clBLAS C CXX VERSION 2.3.0)
 endif( )
-
-# Define a version for the code
-if( NOT DEFINED clBLAS_VERSION_MAJOR )
-    set( clBLAS_VERSION_MAJOR 2 )
-endif( )
-
-if( NOT DEFINED clBLAS_VERSION_MINOR )
-    set( clBLAS_VERSION_MINOR 3 )
-endif( )
-
-if( NOT DEFINED clBLAS_VERSION_PATCH )
-    set( clBLAS_VERSION_PATCH 0 )
-endif( )
-
-set( clBLAS_VERSION "${clBLAS_VERSION_MAJOR}.${clBLAS_VERSION_MINOR}.${clBLAS_VERSION_PATCH}")
 
 # Increment this if we break backward compatibility.
 set( clBLAS_SOVERSION 2 )
