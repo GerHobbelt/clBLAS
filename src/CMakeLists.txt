@@ -14,8 +14,13 @@
 # limitations under the License.
 # ########################################################################
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
+include("HunterGate.cmake")
+HunterGate(
+    URL "https://github.com/ruslo/hunter/archive/v0.17.3.tar.gz"
+    SHA1 "2a2f193860e2cb3b884bce74d85c3f30b1092274"
+)
 #User toggle-able options that can be changed on the command line with -D
 option( BUILD_RUNTIME "Build the BLAS runtime library" ON )
 option( BUILD_TEST "Build the library testing suite (dependency on google test, Boost, and ACML/NETLIB BLAS)" ON )
@@ -95,11 +100,12 @@ if( CMAKE_GENERATOR MATCHES "NMake" )
   endif( )
 endif( )
 
-# If we are on linux, and we wish to link with the netlib BLAS implementation when BUILD_TEST is ON, we need to have a valid fortran compiler
-if(BUILD_TEST AND NOT CORR_TEST_WITH_ACML AND NOT WIN32 AND NOT APPLE)
-  project(clBLAS Fortran C CXX )
+# If we are on linux, and we wish to link with the netlib BLAS implementation, we need to have a valid fortran compiler
+if( BUILD_TEST AND NOT CORR_TEST_WITH_ACML AND NOT WIN32 AND NOT APPLE )
+  project(clBLAS VERSION 2.3.0 LANGUAGES Fortran C CXX)
+
 else( )
-  project(clBLAS C CXX)
+  project(clBLAS VERSION 2.3.0 LANGUAGES C CXX)
 endif( )
 
 # Define a version for the code
@@ -126,7 +132,7 @@ set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR} )
 # On windows, it's convenient to change the default install prefix such that it does NOT point to 'program files' (permissions problems)
 # Need to check out CMAKE_RUNTIME_OUTPUT_DIRECTORY variable, and see if that eliminates the need to modify install path
 if( WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT )
-	set( CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/package" CACHE PATH "Install path prefix, prepended onto install directories" FORCE )
+    set( CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/package" CACHE PATH "Install path prefix, prepended onto install directories" FORCE )
 endif( )
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -229,12 +235,12 @@ if( BUILD_TEST )
 					${ACML_ROOT}/${ACML_SUBDIR}/lib
 					$ENV{ACML_ROOT}/lib
                                         $ENV{ACML_ROOT}/${ACML_SUBDIR}/lib
-			)
-			find_library(_acml_mv_library acml_mv
-				HINTS
-					${ACML_ROOT}/lib
-					${ACML_ROOT}/${ACML_SUBDIR}/lib
-					$ENV{ACML_ROOT}/lib
+            )
+            find_library(_acml_mv_library acml_mv
+                HINTS
+                    ${ACML_ROOT}/lib
+                    ${ACML_ROOT}/${ACML_SUBDIR}/lib
+                    $ENV{ACML_ROOT}/lib
                                         $ENV{ACML_ROOT}/${ACML_SUBDIR}/lib
 			)
 			mark_as_advanced(_acml_mv_library)
@@ -275,24 +281,28 @@ endif()
 
 
 # This will define OPENCL_FOUND
-find_package( OpenCL ${OPENCL_VERSION} )
 
+hunter_add_package(OpenCL)
+find_package(OpenCL CONFIG REQUIRED)
+set(OPENCL_LIBRARIES OpenCL::OpenCL)
 # Find Boost on the system, and configure the type of boost build we want
+if (BUILD_TEST)
 set( Boost_USE_MULTITHREADED ON )
 set( Boost_USE_STATIC_LIBS   ON )
 set( Boost_DETAILED_FAILURE_MSG   ON )
 # set( Boost_DEBUG ON )
 set( Boost_ADDITIONAL_VERSIONS "1.44.0" "1.44" "1.47.0" "1.47" "1.60.0" "1.60" )
-
-find_package( Boost 1.33.0 COMPONENTS program_options )
-message(STATUS "Boost_PROGRAM_OPTIONS_LIBRARY: ${Boost_PROGRAM_OPTIONS_LIBRARY}")
-
+endif()
+if(BUILD_KTEST OR BUILD_CLIENT)
+    find_package( Boost 1.33.0 COMPONENTS program_options )
+    message(STATUS "Boost_PROGRAM_OPTIONS_LIBRARY: ${Boost_PROGRAM_OPTIONS_LIBRARY}")
+endif()
 
 if( NOT Boost_FOUND )
-	message( STATUS "The clBLAS ktest requires boost to be installed" )
-	set( BUILD_KTEST OFF )
-	message( STATUS "The clBLAS client requires boost to be installed" )
-	set( BUILD_CLIENT OFF )
+    message( STATUS "The clBLAS ktest requires boost to be installed" )
+    set( BUILD_KTEST OFF )
+    message( STATUS "The clBLAS client requires boost to be installed" )
+    set( BUILD_CLIENT OFF )
 endif()
 
 # Turn on maximum compiler verbosity
@@ -340,49 +350,89 @@ configure_file( "${PROJECT_SOURCE_DIR}/clBLAS.version.h.in" "${PROJECT_BINARY_DI
 
 # configure a header file to pass the CMake version settings to the source, and package the header files in the output archive
 install( FILES
-			"clBLAS.h"
-			"clAmdBlas.h"
-			"clAmdBlas.version.h"
-			"clBLAS-complex.h"
-			"${PROJECT_BINARY_DIR}/include/clBLAS.version.h"
-		DESTINATION
-			"./include" )
+            "clBLAS.h"
+            "clAmdBlas.h"
+            "clAmdBlas.version.h"
+            "clBLAS-complex.h"
+            "${PROJECT_BINARY_DIR}/include/clBLAS.version.h"
+        DESTINATION
+            "./include" )
 
+####
+# Installation (https://github.com/forexample/package-example)
+
+set(config_install_dir "lib/cmake/${PROJECT_NAME}")
+set(include_install_dir "include")
+
+set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
+
+# Configuration
+set(version_config "${generated_dir}/${PROJECT_NAME}ConfigVersion.cmake")
+set(project_config "${generated_dir}/${PROJECT_NAME}Config.cmake")
+set(targets_export_name "${PROJECT_NAME}Targets")
+set(namespace "${PROJECT_NAME}::")
+
+# Include module with fuction 'write_basic_package_version_file'
+include(CMakePackageConfigHelpers)
+
+# Note: PROJECT_VERSION is used as a VERSION
+write_basic_package_version_file(
+    "${version_config}" COMPATIBILITY SameMajorVersion
+)
+
+# Use variables:
+#   * targets_export_name
+#   * PROJECT_NAME
+configure_package_config_file(
+    "cmake/Config.cmake.in"
+    "${project_config}"
+    INSTALL_DESTINATION "${config_install_dir}"
+)
+
+install(
+    FILES "${project_config}" "${version_config}"
+    DESTINATION "${config_install_dir}"
+)
+
+install(
+    EXPORT "${targets_export_name}"
+    NAMESPACE "${namespace}"
+    DESTINATION "${config_install_dir}"
+)
 
 if( BUILD_CLIENT AND IS_DIRECTORY "${PROJECT_SOURCE_DIR}/client")
-	add_subdirectory( client )
+    add_subdirectory( client )
 endif( )
 
 if( BUILD_PERFORMANCE AND IS_DIRECTORY "${PROJECT_SOURCE_DIR}/scripts/perf" )
-	add_subdirectory( scripts/perf )
+    add_subdirectory( scripts/perf )
 endif( )
 
 if( BUILD_RUNTIME AND IS_DIRECTORY "${PROJECT_SOURCE_DIR}/library" )
-#	add_subdirectory( library/tools/bingen )
-	add_subdirectory( library )
-	add_subdirectory( library/tools/tune )
-	if( BUILD_KTEST )
-		add_subdirectory( library/tools/ktest )
-	endif( )
+    add_subdirectory( library )
+    add_subdirectory( library/tools/tune )
+    if( BUILD_KTEST )
+        add_subdirectory( library/tools/ktest )
+    endif( )
 endif()
 
 if( BUILD_SAMPLE AND IS_DIRECTORY "${PROJECT_SOURCE_DIR}/samples" )
-	add_subdirectory( samples )
+    add_subdirectory( samples )
 endif( )
 
 # The build server is not supposed to build or package any of the tests; build server script will define this on the command line with
 # cmake -G "Visual Studio 10 Win64" -D BUILDSERVER:BOOL=ON ../..
 if( BUILD_TEST )
-	if( IS_DIRECTORY "${PROJECT_SOURCE_DIR}/tests" )
-		add_subdirectory(tests)
-	endif( )
+    if( IS_DIRECTORY "${PROJECT_SOURCE_DIR}/tests" )
+        add_subdirectory(tests)
+    endif( )
 
-	# These tests #include <getopts.h>, which is not windows compliant
-	if (NOT WIN32 AND IS_DIRECTORY "${PROJECT_SOURCE_DIR}/library" )
-		add_subdirectory( library/blas/gens/tests )
-		add_subdirectory( library/blas/gens/legacy/tests )
-		add_subdirectory( library/common/tests )
-	endif( )
+    # These tests #include <getopts.h>, which is not windows compliant
+    if (NOT WIN32 AND IS_DIRECTORY "${PROJECT_SOURCE_DIR}/library" )
+        add_subdirectory( library/blas/gens/tests )
+        add_subdirectory( library/blas/gens/legacy/tests )
+        add_subdirectory( library/common/tests )
+    endif( )
 endif( )
 
 if(WIN32)
@@ -391,14 +441,6 @@ else()
   set(destdir lib${SUFFIX_LIB}/cmake/clBLAS)
 endif()
 string(REGEX REPLACE "[^/]+" ".." reldir "${destdir}")
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/clBLASConfigVersion.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/clBLASConfigVersion.cmake
-  @ONLY)
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/clBLASConfig.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/clBLASConfig.cmake
-  @ONLY)
 install(EXPORT Library DESTINATION ${destdir} FILE clBLASTargets.cmake)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/clBLASConfigVersion.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/clBLASConfig.cmake
@@ -407,17 +449,17 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/clBLASConfigVersion.cmake
 
 # The following code is setting variables to control the behavior of CPack to generate our
 if( WIN32 )
-	set( CPACK_SOURCE_GENERATOR "ZIP" )
-	set( CPACK_GENERATOR "ZIP" )
+    set( CPACK_SOURCE_GENERATOR "ZIP" )
+    set( CPACK_GENERATOR "ZIP" )
 else( )
-	set( CPACK_SOURCE_GENERATOR "TGZ" )
-	set( CPACK_GENERATOR "TGZ" )
+    set( CPACK_SOURCE_GENERATOR "TGZ" )
+    set( CPACK_GENERATOR "TGZ" )
 endif( )
 
 if( TARGET_PLATFORM EQUAL 64 )
-	set( CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${clBLAS_VERSION}-${CMAKE_HOST_SYSTEM_NAME}-x64")
+    set( CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${clBLAS_VERSION}-${CMAKE_HOST_SYSTEM_NAME}-x64")
 else( )
-	set( CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${clBLAS_VERSION}-${CMAKE_HOST_SYSTEM_NAME}-x32")
+    set( CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${clBLAS_VERSION}-${CMAKE_HOST_SYSTEM_NAME}-x32")
 endif( )
 
 set( CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${clBLAS_VERSION}-${CMAKE_HOST_SYSTEM_NAME}-Source")
