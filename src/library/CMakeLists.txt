@@ -692,7 +692,7 @@ endif()
 
 include( ExternalProject )
 ExternalProject_Add( tplgen
-    URL "${CMAKE_SOURCE_DIR}/library/tools/tplgen"
+	SOURCE_DIR "${CMAKE_SOURCE_DIR}/library/tools/tplgen"
     INSTALL_COMMAND ""
 )
 
