@@ -14,7 +14,23 @@
 # limitations under the License.
 # ########################################################################
 
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+
 cmake_minimum_required(VERSION 3.0)
+
+include ("HunterGate.cmake")
+
+HunterGate(
+    URL "https://github.com/artomatix/hunter/archive/v0.20-clBLAS.tar.gz"
+    SHA1 "aa0096756f372954be04826ca80e6818fd876f9c"
+	LOCAL
+    )
+
+
+
 
 #User toggle-able options that can be changed on the command line with -D
 option( BUILD_RUNTIME "Build the BLAS runtime library" ON )
@@ -180,17 +196,30 @@ if( BUILD_TEST )
 endif( )
 
 # This will define OPENCL_FOUND
-find_package( OpenCL )
 
-# Find Google Test package
-find_package( GTest )
+hunter_add_package(OpenCL)
 
-# Find Boost on the system, and configure the type of boost build we want
-set( Boost_USE_MULTITHREADED ON )
-set( Boost_USE_STATIC_LIBS   ON )
-set( Boost_DETAILED_FAILURE_MSG   ON )
-set( Boost_DEBUG ON )
-set( Boost_ADDITIONAL_VERSIONS "1.44.0" "1.44" "1.47.0" "1.47" )
+find_package(OpenCL REQUIRED CONFIG)
+
+set(OPENCL_LIBRARIES OpenCL::OpenCL)
+
+
+
+
+
+if (BUILD_TEST)
+
+	# Find Google Test package
+	find_package( GTest )
+
+	# Find Boost on the system, and configure the type of boost build we want
+	set( Boost_USE_MULTITHREADED ON )
+	set( Boost_USE_STATIC_LIBS   ON )
+	set( Boost_DETAILED_FAILURE_MSG   ON )
+	set( Boost_DEBUG ON )
+	set( Boost_ADDITIONAL_VERSIONS "1.44.0" "1.44" "1.47.0" "1.47" )
+
+endif()
 
 if(BUILD_KTEST OR BUILD_CLIENT)
     find_package( Boost 1.33.0 COMPONENTS program_options )
