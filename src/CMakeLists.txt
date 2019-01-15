@@ -280,11 +280,55 @@ if( BUILD_CLIENT )
 endif()
 
 
-# This will define OPENCL_FOUND
 
-hunter_add_package(OpenCL)
-find_package(OpenCL CONFIG REQUIRED)
-set(OPENCL_LIBRARIES OpenCL::OpenCL)
+### This will define OPENCL_FOUND
+### OPENCL ICD
+
+set (OPENCL_ICD_LOADER_SOURCES ICDLoader/icd.c ICDLoader/icd_dispatch.c)
+
+if (WIN32)
+    list (APPEND OPENCL_ICD_LOADER_SOURCES 
+                    ICDLoader/icd_windows.c 
+                    ICDLoader/icd_windows_hkr.c
+                    ICDLoader/OpenCL.def
+                    ICDLoader/OpenCL.rc)
+    include_directories ($ENV{DXSDK_DIR}/Include)
+
+else()
+    list (APPEND OPENCL_ICD_LOADER_SOURCES 
+                    ICDLoader/icd_linux.c 
+                    ICDLoader/icd_exports.map)
+
+endif()
+
+if (NOT DEFINED OPENCL_INCLUDE_DIRS)
+    set (OPENCL_INCLUDE_DIRS ./include)
+endif ()
+
+include_directories (${OPENCL_INCLUDE_DIRS})
+
+add_library (OpenCL ${OPENCL_ICD_LOADER_SOURCES})
+set_target_properties (OpenCL PROPERTIES VERSION "2.1" SOVERSION "1")
+
+
+if (WIN32)
+    target_link_libraries (OpenCL PUBLIC cfgmgr32.lib)
+else()
+    if (APPLE)
+        set_target_properties (OpenCL PROPERTIES LINK_FLAGS "-pthread")
+    else ()
+        set_target_properties (OpenCL PROPERTIES LINK_FLAGS "-pthread -Wl,--version-script -Wl,${CMAKE_CURRENT_SOURCE_DIR}/icd_exports.map")
+    endif ()
+endif ()
+
+set (OPENCL_FOUND ON)
+
+find_package(Threads REQUIRED)
+
+target_link_libraries(OpenCL PRIVATE Threads::Threads ${CMAKE_DL_LIBS})
+###
+
+set(OPENCL_LIBRARIES OpenCL)
 # Find Boost on the system, and configure the type of boost build we want
 if (BUILD_TEST)
 set( Boost_USE_MULTITHREADED ON )
