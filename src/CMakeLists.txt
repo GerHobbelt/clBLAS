@@ -24,8 +24,8 @@ cmake_minimum_required(VERSION 3.0)
 include ("HunterGate.cmake")
 
 HunterGate(
-    URL "https://github.com/artomatix/hunter/archive/v0.20-clBLAS.tar.gz"
-    SHA1 "aa0096756f372954be04826ca80e6818fd876f9c"
+    URL "https://github.com/artomatix/hunter/archive/v0.35-clBLAS.tar.gz"
+    SHA1 "ef043675bd1b695e399c5259cd298d8921ec3f0d"
 	LOCAL
     )
 
@@ -199,7 +199,7 @@ endif( )
 
 hunter_add_package(OpenCL)
 
-find_package(OpenCL REQUIRED CONFIG)
+find_package(OpenCL REQUIRED)
 
 set(OPENCL_LIBRARIES OpenCL::OpenCL)
 
