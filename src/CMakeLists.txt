@@ -18,8 +18,9 @@ cmake_minimum_required(VERSION 3.0)
 
 include("HunterGate.cmake")
 HunterGate(
-    URL "https://github.com/ruslo/hunter/archive/v0.17.3.tar.gz"
-    SHA1 "2a2f193860e2cb3b884bce74d85c3f30b1092274"
+	LOCAL
+	URL "https://github.com/Artomatix/hunter/archive/v33-OpenCL.tar.gz"
+    SHA1 d247ef6b7e80545f261104de339b95dfc505ba78
 )
 #User toggle-able options that can be changed on the command line with -D
 option( BUILD_RUNTIME "Build the BLAS runtime library" ON )
@@ -283,7 +284,7 @@ endif()
 # This will define OPENCL_FOUND
 
 hunter_add_package(OpenCL)
-find_package(OpenCL CONFIG REQUIRED)
+find_package(OpenCL REQUIRED)
 set(OPENCL_LIBRARIES OpenCL::OpenCL)
 # Find Boost on the system, and configure the type of boost build we want
 if (BUILD_TEST)
