@@ -326,12 +326,12 @@ typedef CL_API_ENTRY cl_int (CL_API_CALL *KHRpfn_clSetProgramSpecializationConst
     cl_program           program,
     cl_uint              spec_id,
     size_t               spec_size,
-    const void*          spec_value);
+    const void*          spec_value) CL_API_SUFFIX__VERSION_2_2;
 
 typedef CL_API_ENTRY cl_int (CL_API_CALL *KHRpfn_clSetProgramReleaseCallback)(
     cl_program           program,
     void (CL_CALLBACK *  pfn_notify)(cl_program program, void * user_data),
-    void *               user_data);
+    void *               user_data) CL_API_SUFFIX__VERSION_2_2;
 
 typedef CL_API_ENTRY cl_int (CL_API_CALL *KHRpfn_clUnloadPlatformCompiler)(
     cl_platform_id     platform) CL_API_SUFFIX__VERSION_1_2;

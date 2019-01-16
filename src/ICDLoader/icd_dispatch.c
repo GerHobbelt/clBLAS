@@ -585,9 +585,9 @@ clLinkProgram(cl_context           context,
 
 CL_API_ENTRY cl_int CL_API_CALL
 clSetProgramSpecializationConstant(cl_program  program,
-    cl_uint     spec_id,
-    size_t      spec_size,
-    const void* spec_value)
+                                   cl_uint     spec_id,
+                                   size_t      spec_size,
+                                   const void* spec_value) CL_API_SUFFIX__VERSION_2_2
 {
     KHR_ICD_VALIDATE_HANDLE_RETURN_ERROR(program, CL_INVALID_PROGRAM);
     return program->dispatch->clSetProgramSpecializationConstant(
@@ -600,7 +600,7 @@ clSetProgramSpecializationConstant(cl_program  program,
 CL_API_ENTRY cl_int CL_API_CALL
 clSetProgramReleaseCallback(cl_program  program,
                             void (CL_CALLBACK * pfn_notify)(cl_program program, void * user_data),
-                            void *              user_data) 
+                            void *              user_data) CL_API_SUFFIX__VERSION_2_2
 {
     KHR_ICD_VALIDATE_HANDLE_RETURN_ERROR(program, CL_INVALID_PROGRAM);
     return program->dispatch->clSetProgramReleaseCallback(
@@ -1834,15 +1834,15 @@ CL_API_ENTRY cl_int CL_API_CALL clGetGLContextInfoKHR(
 }
 
 CL_API_ENTRY cl_event CL_API_CALL clCreateEventFromGLsyncKHR(
-    cl_context context,
-    cl_GLsync sync,
-    cl_int * errcode_ret) CL_API_SUFFIX__VERSION_1_1
+	cl_context context,
+	cl_GLsync sync,
+	cl_int * errcode_ret) CL_API_SUFFIX__VERSION_1_1
 {
-    KHR_ICD_VALIDATE_HANDLE_RETURN_HANDLE(context, CL_INVALID_CONTEXT);
-    return context->dispatch->clCreateEventFromGLsyncKHR(
-        context,
-        sync,
-        errcode_ret);
+	KHR_ICD_VALIDATE_HANDLE_RETURN_HANDLE(context, CL_INVALID_CONTEXT);
+	return context->dispatch->clCreateEventFromGLsyncKHR(
+		context,
+		sync,
+		errcode_ret);
 }
 
 #if defined(_WIN32)
@@ -2095,7 +2095,7 @@ clGetDeviceIDsFromDX9MediaAdapterKHR(
     return platform->dispatch->clGetDeviceIDsFromDX9MediaAdapterKHR(
         platform,
         num_media_adapters,
-        media_adapters_type,
+		media_adapters_type,
         media_adapters,
         media_adapter_set,
         num_entries,

@@ -307,7 +307,7 @@ endif ()
 
 include_directories (${OPENCL_INCLUDE_DIRS})
 
-add_library (OpenCL ${OPENCL_ICD_LOADER_SOURCES})
+add_library (OpenCL STATIC ${OPENCL_ICD_LOADER_SOURCES})
 set_target_properties (OpenCL PROPERTIES VERSION "2.1" SOVERSION "1")
 
 
@@ -432,6 +432,7 @@ configure_package_config_file(
     "${project_config}"
     INSTALL_DESTINATION "${config_install_dir}"
 )
+
 
 install(
     FILES "${project_config}" "${version_config}"
