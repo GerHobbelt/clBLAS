@@ -17,10 +17,12 @@
 cmake_minimum_required(VERSION 3.0)
 
 include("HunterGate.cmake")
+
 HunterGate(
-    URL "https://github.com/ruslo/hunter/archive/v0.17.3.tar.gz"
-    SHA1 "2a2f193860e2cb3b884bce74d85c3f30b1092274"
+    URL "https://github.com/ruslo/hunter/archive/v0.23.94.tar.gz"
+    SHA1 "3f4c104df81f1c4a627f4b0ea9f3306de1b0b54b"
 )
+
 #User toggle-able options that can be changed on the command line with -D
 option( BUILD_RUNTIME "Build the BLAS runtime library" ON )
 option( BUILD_TEST "Build the library testing suite (dependency on google test, Boost, and ACML/NETLIB BLAS)" ON )
