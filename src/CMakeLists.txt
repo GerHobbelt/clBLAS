@@ -24,8 +24,8 @@ cmake_minimum_required(VERSION 3.0)
 include ("HunterGate.cmake")
 
 HunterGate(
-	URL  "https://github.com/Artomatix/hunter/archive/v41-clBLAS.tar.gz"
-	SHA1 "1e50be21b71b730546d3474c8d9339c37d49bb0a"
+	URL  "https://github.com/Artomatix/hunter/archive/v47-clBLAS.tar.gz"
+	SHA1 "92957d0d63434d52b843e87277f5aaff16003795"
 	LOCAL
     )
 
