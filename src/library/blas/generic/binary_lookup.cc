@@ -395,7 +395,7 @@ static cl_int getSingleBinaryFromProgram(cl_program program,
                                   &num_devices, NULL);
     if (err != CL_SUCCESS)
     {
-        std::cerr << "Error querying for program binary sizes" << std::endl;
+        std::cerr << "Error querying for program binary sizes: CL_PROGRAM_NUM_DEVICES " << err << std::endl;
         return err;
     }
 
@@ -405,7 +405,7 @@ static cl_int getSingleBinaryFromProgram(cl_program program,
                            sizes.data(), NULL);
     if (err != CL_SUCCESS)
     {
-        std::cerr << "Error querying for program binary sizes" << std::endl;
+        std::cerr << "Error querying for program binary sizes CL_PROGRAM_BINARY_SIZES " << err << std::endl;
         return err;
     }
 
@@ -420,8 +420,8 @@ static cl_int getSingleBinaryFromProgram(cl_program program,
                            binary_address, NULL);
     if (err != CL_SUCCESS)
     {
-#if CAPS_DEBUG
-        std::cerr << "Error querying for program binaries" << std::endl;
+#if !CAPS_DEBUG
+        std::cerr << "Error querying for program binaries CL_PROGRAM_BINARIES " << err << std::endl;
 #endif
         return err;
     }
