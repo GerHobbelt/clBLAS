@@ -32,7 +32,7 @@
 #include <stdarg.h>
 #if defined( _WIN32 )
 	#define NOMINMAX
-	#define WIN32_LEAN_AND_MEAN			// Exclude rarely-used stuff from Windows headers
+	//#define WIN32_LEAN_AND_MEAN			// Exclude rarely-used stuff from Windows headers
 
 	#include <tchar.h>
 	#include <windows.h>
