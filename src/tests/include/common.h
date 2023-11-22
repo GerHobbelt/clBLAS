@@ -19,7 +19,7 @@
 #define COMMON_H_
 
 #if defined (_MSC_VER)
-#define __template_static static
+#define __template_static 
 #else   /* _MSC_VER */
 #define __template_static
 #endif  /* !_MSC_VER */
