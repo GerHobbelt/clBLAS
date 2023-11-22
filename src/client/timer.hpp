@@ -18,6 +18,7 @@
 #define TIMER_HXX__
 
 #include <time.h>
+#include "../tests/include/timer.h"
 
 class timer
 {
@@ -31,11 +32,10 @@ public:
 private:
   inline double get_walltime()
   {
-    struct timespec ts;
+	  nano_time_t t = getCurrentTime();
+	  nano_time_t ts = conv2nanosec(t);
 
-    clock_gettime(CLOCK_REALTIME, &ts);
-    return static_cast<double>(ts.tv_sec) +
-      static_cast<double>(ts.tv_nsec) * 1.0e-9;
+      return static_cast<double>(ts) / 1.0e-9;
   }
 
 private:
