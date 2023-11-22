@@ -104,7 +104,7 @@ bool BinaryLookup::CacheEntry::successful_creation()
 bool BinaryLookup::CacheEntry::exclusive_create()
 {
 #ifdef _WIN32
-    HANDLE handle = CreateFile(this->m_filename.c_str(), 
+    HANDLE handle = CreateFileA(this->m_filename.c_str(), 
                                GENERIC_WRITE, 
                                0, // no share with other process
                                NULL,
